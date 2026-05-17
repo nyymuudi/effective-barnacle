@@ -3,10 +3,18 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "effective_barnacle"
+name = "realistinen-korttisekoitus"
 version = "0.1.0"
 description = "GSR-malliin perustuva realistinen korttien sekoitusalgoritmi"
 requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
