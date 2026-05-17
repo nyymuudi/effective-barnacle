@@ -81,8 +81,8 @@ Results are empirical and depend on:
 ## Installation
 
 ```bash
-git clone git@github.com:nyymuudi/effective-barnacle.git
-cd effective-barnacle
+git clone git@github.com:nyymuudi/realistic-card-shuffle.git
+cd realistic-card-shuffle
 pip3 install -e .
 ```
 
