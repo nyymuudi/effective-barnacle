@@ -36,32 +36,6 @@ cd effective-barnacle
 pip3 install -e .
 ```
 
-## Usage
-
-### Python API
-
-```python
-from realistinen_korttisekoitus.models import Kortti, Pelaaja, Käsi, EdellinenJako
-from realistinen_korttisekoitus.engine import valmistele_pakka_seuraavaa_jakoa_varten
-
-p1 = Pelaaja("Alice", 1)
-p2 = Pelaaja("Bob", 2)
-
-deal = EdellinenJako(
-    poltetut=[Kortti("♣", "3"), Kortti("♢", "5"), Kortti("♠", "2")],
-    yhteiset=[
-        Kortti("♠", "J"), Kortti("♡", "10"), Kortti("♢", "2"),
-        Kortti("♣", "9"), Kortti("♠", "4"),
-    ],
-    kädet=[
-        Käsi(p1, [Kortti("♠", "A"), Kortti("♡", "K")], voittiko=True),
-        Käsi(p2, [Kortti("♣", "7"), Kortti("♢", "8")]),
-    ],
-)
-
-deck = valmistele_pakka_seuraavaa_jakoa_varten(deal, riffle_toistot=7, tee_strip=True)
-```
-
 ### CLI
 
 ```bash
