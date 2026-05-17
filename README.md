@@ -28,14 +28,6 @@ Running 10,000 Monte Carlo simulations confirms the Bayer & Diaconis result empi
 
 **After 7 riffles**, GSR becomes statistically indistinguishable from Fisher-Yates across all metrics. TVD converges to 0.028 and biased cards drop to zero — consistent with the theoretical result that 7 riffle shuffles suffice to approach the uniform distribution on 52-card decks.
 
-## Installation
-
-```bash
-git clone git@github.com:nyymuudi/effective-barnacle.git
-cd effective-barnacle
-pip3 install -e .
-```
-
 ### CLI
 
 ```bash
