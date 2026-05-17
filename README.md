@@ -44,11 +44,27 @@ Running 10,000 Monte Carlo simulations confirms the Bayer & Diaconis result empi
 
 **After 4 riffles**, 13 cards show statistically significant positional bias — residual structure from the collection order remains detectable. This is the vulnerability Diaconis identified in casino contexts.
 
-**After 7 riffles**, GSR becomes statistically indistinguishable from Fisher-Yates across all metrics. TVD converges to 0.028 and biased cards drop to zero — consistent with the theoretical result that 7 riffle shuffles suffice to approach the uniform distribution on 52-card decks.
+**After 7 riffles**, After 7 riffles, GSR approaches Fisher–Yates closely across all measured metrics. TVD converges to 0.028 and biased cards drop to zero — consistent with the theoretical result that 7 riffle shuffles suffice to approach the uniform distribution on 52-card decks.
 
 > **Note:** TVD values are estimated empirically from finite samples (10,000 iterations). Fisher-Yates TVD ≈ 0.028 reflects estimation noise, not algorithmic bias.
 
 <img width="2384" height="770" alt="image" src="https://github.com/user-attachments/assets/69f5e2e9-13bc-4108-b8a9-3b0cf968a734" />
+
+## Research Notes
+
+This simulator approximates real-world shuffling behavior but does not
+attempt to model all biomechanical properties of human dealers.
+
+The implementation focuses on:
+- probabilistic riffle interleaving,
+- collection-order persistence,
+- imperfect cuts,
+- and convergence behavior under repeated shuffling.
+
+Results are empirical and depend on:
+- iteration count,
+- chosen metrics,
+- and shuffle parameterization.
 
 ## Installation
 
