@@ -3,7 +3,9 @@ Testit keräyslogiikalle (kerays.py) ja pääputkelle (engine.py).
 """
 import pytest
 from collections import Counter
-from realistinen_korttisekoitus.kerays import kerää_kortit
+from realistinen_korttisekoitus.kerays import KERÄYS_STRATEGIAT
+
+kerää_kortit = KERÄYS_STRATEGIAT["perus"]
 from realistinen_korttisekoitus.engine import valmistele_pakka_seuraavaa_jakoa_varten
 from realistinen_korttisekoitus.models import Kortti, Pelaaja, Käsi, EdellinenJako
 
