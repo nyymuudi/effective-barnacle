@@ -1,3 +1,4 @@
+import random
 from typing import Callable
 from .models import EdellinenJako, Kortti
 
@@ -53,7 +54,46 @@ def _voittaja_päälle(jako: EdellinenJako) -> list[Kortti]:
     return pakka
 
 
+def _wash_keräys(jako: EdellinenJako) -> list[Kortti]:
+    """
+    Wash/Scramble-strategia: kortit levitetään pöydälle ja sekoitetaan
+    käsin ennen keräämistä — kasinoissa käytetty käytäntö erityisesti
+    uuden pakan käyttöönoton yhteydessä.
+
+    Fyysinen vastine: dealer liu'uttaa kortteja satunnaisesti pöydällä
+    ennen kuin kerää ne pakaksi. Tämä rikkoo collection-order-rakenteen
+    tehokkaammin kuin riffle-sekoitus pienellä toistomäärällä.
+
+    Mallinnus: kortit kerätään perus-järjestyksessä, jonka jälkeen
+    pakka jaetaan satunnaisiin ryhmiin ja ryhmät sekoitetaan keskenään
+    simuloiden pöytälevitystä. Lopputulos on lähempänä uniformia jakaumaa
+    kuin mikään keräysstrategia yksinään — mutta ei täysin satunnainen.
+    """
+    # Kerätään ensin perusjärjestyksessä
+    pakka = _perus_keräys(jako)
+    n = len(pakka)
+
+    # Jaetaan satunnaisiin ryhmiin (3-7 korttia) ja sekoitetaan ryhmät
+    ryhmät: list[list[Kortti]] = []
+    i = 0
+    while i < n:
+        koko = random.randint(3, 7)
+        ryhmät.append(pakka[i:i+koko])
+        i += koko
+
+    random.shuffle(ryhmät)
+
+    # Jokaisen ryhmän sisällä kortit sekoitetaan myös
+    tulos: list[Kortti] = []
+    for ryhmä in ryhmät:
+        random.shuffle(ryhmä)
+        tulos.extend(ryhmä)
+
+    return tulos
+
+
 KERÄYS_STRATEGIAT: dict[str, KeräysStrategia] = {
     "perus": _perus_keräys,
     "voittaja_päälle": _voittaja_päälle,
+    "wash": _wash_keräys,
 }

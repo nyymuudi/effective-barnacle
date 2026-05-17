@@ -50,6 +50,18 @@ Running 10,000 Monte Carlo simulations confirms the Bayer & Diaconis result empi
 
 <img width="2384" height="770" alt="image" src="https://github.com/user-attachments/assets/69f5e2e9-13bc-4108-b8a9-3b0cf968a734" />
 
+### Collection Strategy Effect
+
+Collection strategy has a measurable impact on convergence speed, but only at low riffle counts (1–3). After 4+ riffles, all strategies converge to equivalent TVD (~0.040).
+
+| Strategy | TVD after 1 riffle | TVD after 4 riffles |
+|---|---|---|
+| `perus` | ~0.090 | ~0.040 |
+| `voittaja_päälle` | ~0.091 | ~0.040 |
+| `wash` | ~0.075 | ~0.041 |
+
+The wash strategy disrupts collection-order structure more aggressively at the collection phase itself — reducing initial TVD by ~17% compared to standard collection. This advantage disappears after sufficient riffling, but is practically relevant in casino contexts where dealers typically perform only 3–4 shuffles between hands.
+
 ## Research Notes
 
 This simulator approximates real-world shuffling behavior but does not
@@ -139,10 +151,11 @@ src/realistinen_korttisekoitus/
 
 Two strategies are available for the post-hand card collection phase:
 
-| Strategy | Order | Description |
-|---|---|---|
-| `perus` (default) | burned → losers → winners → community | Standard dealer collection |
-| `voittaja_päälle` | burned → losers → community → winners | Winner's hand collected last, on top |
+| Strategy          | Order                                 | Description                                                                                        |
+| ----------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `perus` (default) | burned → losers → winners → community | Standard dealer collection                                                                         |
+| `voittaja_päälle` | burned → losers → community → winners | Winner's hand collected last, on top                                                               |
+| `wash`            | scrambled groups                      | Cards spread on table and randomly regrouped — breaks collection-order structure most aggressively |
 
 ```python
 valmistele_pakka_seuraavaa_jakoa_varten(deal, keräys_strategia="voittaja_päälle")

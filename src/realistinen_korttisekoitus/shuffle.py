@@ -2,9 +2,20 @@
 Sekoitusfunktiot GSR-mallin mukaisesti.
 
 Leikkauspiste on parametrisoitu kolmella jakaumalla:
-  - "beta"      : betavariate(2,2) — symmetrinen, keskellä todennäköisempi (oletus)
-  - "binomial"  : binomial(n, 0.5) — GSR-mallin teoreettinen jakauma
-  - "uniform"   : tasajakauma — naivi verrokki
+  - "beta"      : Beta(α, β) — jatkuva symmetrinen jakauma välillä (0, 1).
+                  Oletusarvo Beta(2, 2): α=β=2 tuottaa kellomaisen jakauman
+                  joka suosii leikkausta lähellä pakan puoliväliä. Mitä suuremmat
+                  parametrit, sitä tarkemmin leikkaus osuu keskelle (α=β→∞ vastaa
+                  täydellistä puolittamista). Pienemmät parametrit (esim. α=β=0.5)
+                  tuottavat U-muotoisen jakauman jossa reunaleikkaukset yleistyvät —
+                  epärealistinen mutta teoreettisesti mielenkiintoinen rajoitustapaus.
+                  DealerProfiili siirtää α:n ja β:n suhdetta dominant_hand_bias-
+                  parametrin mukaan mallintaen epäsymmetristä leikkausta.
+  - "binomial"  : Binomial(n, 0.5) — GSR-mallin alkuperäinen teoreettinen jakauma
+                  (Bayer & Diaconis 1992). Diskreetti, konsentroi leikkaukset
+                  tiukasti välille [n/2 ± 2√n]. Empiirisesti osoitettu heikommaksi
+                  kuin beta-approksimaatio: TVD 0.041 vs. 0.032 (ks. README).
+  - "uniform"   : Tasajakauma — naivi verrokki, ei fysikaalisesti perusteltu.
 
 Imperfect-variantit mallintavat inhimillistä epätarkkuutta DealerProfiili-parametrien avulla.
 """
