@@ -1,5 +1,9 @@
 # Realistic Card Shuffle
 
+![Tests](https://github.com/nyymuudi/effective-barnacle/actions/workflows/test.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 A Python implementation of the **Gilbert–Shannon–Reeds (GSR) model** for card shuffling, simulating the deterministic physical properties of a real riffle shuffle — as opposed to Fisher-Yates, which produces uniformly random permutations directly.
 
 ## Background

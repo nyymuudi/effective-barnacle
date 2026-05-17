@@ -32,6 +32,12 @@ class TestRiffleShuffle:
         )
         assert muuttui >= 990
 
+    def test_yksi_kortti(self):
+        """Edge case: 1 kortin pakka ei kaadu."""
+        pakka = [Kortti("♠", "A")]
+        tulos = riffle_shuffle(pakka)
+        assert tulos == pakka
+
     def test_pieni_pakka(self):
         """Edge case: 2 kortin pakka."""
         pakka = [Kortti("♠", "A"), Kortti("♡", "K")]

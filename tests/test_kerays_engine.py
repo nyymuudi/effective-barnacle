@@ -102,3 +102,49 @@ class TestEngine:
         random.seed(42)
         tulos2 = valmistele_pakka_seuraavaa_jakoa_varten(perus_jako)
         assert tulos1 == tulos2
+
+
+class TestVoittajaPäälleStrategia:
+    """Testit voittaja_päälle-keräysstrategialle."""
+
+    def setup_method(self):
+        self.kerää = KERÄYS_STRATEGIAT["voittaja_päälle"]
+
+    def test_kaikki_kortit_kerätään(self, perus_jako):
+        kerätty = self.kerää(perus_jako)
+        assert kortti_multiset(kerätty) == kortti_multiset(kaikki_kortit_jaossa(perus_jako))
+
+    def test_ei_duplikaatteja(self, perus_jako):
+        kerätty = self.kerää(perus_jako)
+        assert len(kerätty) == len(set((k.maa, k.arvo) for k in kerätty))
+
+    def test_voittajan_kortit_päällimmäisenä(self, perus_jako):
+        """Voittajan kortit ovat listan lopussa (päällimmäisenä pakassa)."""
+        kerätty = self.kerää(perus_jako)
+        voittajan_kortit = [k.kortit for k in perus_jako.kädet if k.voittiko][0]
+        assert kerätty[-len(voittajan_kortit):] == voittajan_kortit
+
+    def test_yhteiset_ennen_voittajaa(self, perus_jako):
+        """Yhteiset kortit kerätään ennen voittajan käsiä."""
+        kerätty = self.kerää(perus_jako)
+        voittajan_kortit = [k.kortit for k in perus_jako.kädet if k.voittiko][0]
+        idx_voittaja = kerätty.index(voittajan_kortit[0])
+        for yhteinen in perus_jako.yhteiset:
+            assert kerätty.index(yhteinen) < idx_voittaja
+
+    def test_split_pot(self, split_pot_jako):
+        kerätty = self.kerää(split_pot_jako)
+        assert kortti_multiset(kerätty) == kortti_multiset(kaikki_kortit_jaossa(split_pot_jako))
+
+    def test_engine_strategialla(self, perus_jako):
+        """Engine hyväksyy voittaja_päälle-strategian."""
+        tulos = valmistele_pakka_seuraavaa_jakoa_varten(
+            perus_jako, keräys_strategia="voittaja_päälle"
+        )
+        assert kortti_multiset(tulos) == kortti_multiset(kaikki_kortit_jaossa(perus_jako))
+
+    def test_tuntematon_strategia_nostaa_virheen(self, perus_jako):
+        with pytest.raises(ValueError, match="Tuntematon"):
+            valmistele_pakka_seuraavaa_jakoa_varten(
+                perus_jako, keräys_strategia="ei_ole_olemassa"
+            )

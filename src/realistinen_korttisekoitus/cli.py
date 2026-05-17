@@ -29,24 +29,32 @@ def cmd_sekoita(args) -> None:
 
 def cmd_analyysi(args) -> None:
     from .analysis import (
-        aja_simulaatio,
-        aja_fisher_yates_simulaatio,
-        aja_konvergenssianalyysi,
-        piirra_heatmap,
-        piirra_konvergenssikayra,
-        piirra_yhteenveto_taulukko,
+        aja_simulaatio, aja_fisher_yates_simulaatio, aja_konvergenssianalyysi,
+        aja_jakaumavertailu, aja_strategiavertailu,
+        piirra_heatmap, piirra_konvergenssikayra, piirra_jakaumavertailu,
+        piirra_strategiavertailu, piirra_yhteenveto_taulukko,
     )
+
+    if args.jakaumavertailu:
+        print(f"Ajetaan jakaumavertailu ({args.iteraatiot:,} iteraatiota, {args.riffle} rifflellä)...")
+        data = aja_jakaumavertailu(n_iteraatiot=args.iteraatiot, riffle_toistot=args.riffle)
+        piirra_jakaumavertailu(data, tallenna=args.tallenna)
+        return
+
+    if args.strategiavertailu:
+        print(f"Ajetaan strategiavertailu ({args.iteraatiot:,} iteraatiota, 1–10 rifflellä)...")
+        data = aja_strategiavertailu(n_iteraatiot=args.iteraatiot)
+        piirra_strategiavertailu(data, tallenna=args.tallenna)
+        return
 
     print(f"Ajetaan simulaatio ({args.iteraatiot:,} iteraatiota, {args.riffle} rifflellä)...")
     gsr = aja_simulaatio(n_iteraatiot=args.iteraatiot, riffle_toistot=args.riffle)
     fy = aja_fisher_yates_simulaatio(n_iteraatiot=args.iteraatiot)
-
     piirra_yhteenveto_taulukko(gsr, fy, riffle_toistot=args.riffle)
 
     if not args.ei_kuvia:
         piirra_heatmap(gsr, otsikko=f"GSR ({args.riffle} rifflellä)", tallenna=args.tallenna)
         piirra_heatmap(fy, otsikko="Fisher-Yates")
-
         print("Ajetaan konvergenssianalyysi (1–10 rifflellä)...")
         konv = aja_konvergenssianalyysi(n_iteraatiot=args.iteraatiot)
         piirra_konvergenssikayra(konv, fy, tallenna=args.tallenna)
@@ -67,10 +75,13 @@ def main():
     p_ana.add_argument("--riffle", type=int, default=4)
     p_ana.add_argument("--iteraatiot", type=int, default=10_000)
     p_ana.add_argument("--ei-kuvia", action="store_true")
-    p_ana.add_argument("--tallenna", type=str, default=None, help="Tallenna kuva polkuun")
+    p_ana.add_argument("--tallenna", type=str, default=None)
+    p_ana.add_argument("--jakaumavertailu", action="store_true",
+                       help="Vertaa beta/binomial/uniform leikkauspistejakaumia")
+    p_ana.add_argument("--strategiavertailu", action="store_true",
+                       help="Vertaa keräysstrategioiden konvergenssia")
 
     args = parser.parse_args()
-
     if args.komento == "sekoita":
         cmd_sekoita(args)
     elif args.komento == "analyysi":

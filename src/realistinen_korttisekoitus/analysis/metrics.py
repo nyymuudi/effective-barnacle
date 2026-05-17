@@ -22,7 +22,9 @@ def laske_entropia(counts: np.ndarray) -> np.ndarray:
     Palauttaa:
         entropiat: (n,) vektori, yksi entropiarvo per kortti.
     """
-    frekvenssit = counts / counts.sum(axis=1, keepdims=True)
+    row_sums = counts.sum(axis=1, keepdims=True)
+    row_sums = np.where(row_sums == 0, 1, row_sums)  # vältetään jako nollalla
+    frekvenssit = counts / row_sums
     # Vältetään log(0): nollataan nolla-arvot
     frekvenssit = np.where(frekvenssit > 0, frekvenssit, 1e-10)
     return -np.sum(frekvenssit * np.log2(frekvenssit), axis=1)
@@ -63,7 +65,9 @@ def laske_total_variation_distance(counts: np.ndarray) -> np.ndarray:
         tvd: (n,) vektori
     """
     n = counts.shape[1]
-    frekvenssit = counts / counts.sum(axis=1, keepdims=True)
+    row_sums = counts.sum(axis=1, keepdims=True)
+    row_sums = np.where(row_sums == 0, 1, row_sums)  # vältetään jako nollalla
+    frekvenssit = counts / row_sums
     return 0.5 * np.sum(np.abs(frekvenssit - 1 / n), axis=1)
 
 
