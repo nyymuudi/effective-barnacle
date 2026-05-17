@@ -48,7 +48,7 @@ Running 10,000 Monte Carlo simulations confirms the Bayer & Diaconis result empi
 
 > **Note:** TVD values are estimated empirically from finite samples (10,000 iterations). Fisher-Yates TVD ≈ 0.028 reflects estimation noise, not algorithmic bias.
 
-![GSR Shuffle Analysis](docs/shuffle_analysis.png)
+<img width="2384" height="770" alt="image" src="https://github.com/user-attachments/assets/69f5e2e9-13bc-4108-b8a9-3b0cf968a734" />
 
 ## Installation
 
