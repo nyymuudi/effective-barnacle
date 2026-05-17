@@ -8,6 +8,7 @@ Leikkauspiste on parametrisoitu kolmella jakaumalla:
 
 Imperfect-variantit mallintavat inhimillistä epätarkkuutta DealerProfiili-parametrien avulla.
 """
+import math
 import random
 import numpy as np
 
@@ -85,10 +86,13 @@ def imperfect_riffle_shuffle(pakka: list, profiili) -> list:
         # Perustodennäköisyys GSR-mallin mukaan
         p_vasen = vasen_jaljella / (vasen_jaljella + oikea_jaljella)
 
-        # pressure_variance lisää kohinaa todennäköisyyteen
+        # pressure_variance lisää kohinaa todennäköisyyteen.
+        # Logistinen transformaatio pitää arvon aina (0, 1) välillä
+        # ilman keinotekoista klippausta — fysikaalisesti perustellumpi.
         if profiili.pressure_variance > 0:
             noise = random.gauss(0, profiili.pressure_variance)
-            p_vasen = max(0.01, min(0.99, p_vasen + noise))
+            logit = math.log(p_vasen / (1 - p_vasen)) + noise
+            p_vasen = 1 / (1 + math.exp(-logit))
 
         # Valitaan puoli
         ota_vasemmalta = random.random() < p_vasen
