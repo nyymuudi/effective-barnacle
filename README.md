@@ -4,11 +4,25 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-A Python implementation of the **Gilbert–Shannon–Reeds (GSR) model** for card shuffling, simulating the deterministic physical properties of a real riffle shuffle — as opposed to Fisher-Yates, which produces uniformly random permutations directly.
+A statistically grounded simulation of real-world card shuffling based on the Gilbert–Shannon–Reeds (GSR) riffle model. Unlike Fisher–Yates, which generates uniformly random permutations directly, this project models the physical shuffle process itself — including collection order, imperfect riffles, strip shuffles, and cuts.
+
+## Key Insight
+
+Even when using statistically strong riffle shuffling, the *collection order* from the previous hand leaves detectable structure in the deck for several shuffle rounds. This simulator models that hidden state explicitly — and measures it.
+
+## Why This Matters
+
+Realistic shuffle simulation has applications in:
+- **Casino procedure analysis** — how many shuffles are actually needed?
+- **Poker fairness research** — does collection order introduce measurable bias?
+- **Shuffle bias visualization** — positional heatmaps reveal residual structure
+- **Entropy convergence studies** — empirically verify theoretical mixing bounds
+- **Game AI environments** — more realistic deck state modeling
+- **Educational probability demonstrations** — GSR vs uniform randomness
 
 ## Background
 
-Bayer & Diaconis (1992) formalized the GSR model: a deck is cut according to a binomial distribution and cards fall from either half with probability proportional to the remaining pile size. The process is deterministic in the sense that the outcome depends on physical parameters rather than pseudorandomness.
+Bayer & Diaconis (1992) formalized the GSR model: a deck is cut according to a binomial distribution and cards fall from either half with probability proportional to the remaining pile size. Unlike Fisher–Yates, the GSR model approximates the stochastic mechanics of real riffle shuffling, producing distributions that reflect physical constraints rather than uniform randomness.
 
 This implementation models the full post-hand collection and shuffle sequence in a poker game:
 
@@ -32,17 +46,62 @@ Running 10,000 Monte Carlo simulations confirms the Bayer & Diaconis result empi
 
 **After 7 riffles**, GSR becomes statistically indistinguishable from Fisher-Yates across all metrics. TVD converges to 0.028 and biased cards drop to zero — consistent with the theoretical result that 7 riffle shuffles suffice to approach the uniform distribution on 52-card decks.
 
+> **Note:** TVD values are estimated empirically from finite samples (10,000 iterations). Fisher-Yates TVD ≈ 0.028 reflects estimation noise, not algorithmic bias.
+
+![GSR Shuffle Analysis](docs/shuffle_analysis.png)
+
+## Installation
+
+```bash
+git clone git@github.com:nyymuudi/effective-barnacle.git
+cd effective-barnacle
+pip3 install -e .
+```
+
+## Usage
+
+### Python API
+
+```python
+from realistinen_korttisekoitus.models import Kortti, Pelaaja, Käsi, EdellinenJako
+from realistinen_korttisekoitus.engine import valmistele_pakka_seuraavaa_jakoa_varten
+
+p1 = Pelaaja("Alice", 1)
+p2 = Pelaaja("Bob", 2)
+
+deal = EdellinenJako(
+    poltetut=[Kortti("♣", "3"), Kortti("♢", "5"), Kortti("♠", "2")],
+    yhteiset=[
+        Kortti("♠", "J"), Kortti("♡", "10"), Kortti("♢", "2"),
+        Kortti("♣", "9"), Kortti("♠", "4"),
+    ],
+    kädet=[
+        Käsi(p1, [Kortti("♠", "A"), Kortti("♡", "K")], voittiko=True),
+        Käsi(p2, [Kortti("♣", "7"), Kortti("♢", "8")]),
+    ],
+)
+
+# Reproducible result with seed
+deck = valmistele_pakka_seuraavaa_jakoa_varten(deal, riffle_toistot=7, seed=42)
+```
+
 ### CLI
 
 ```bash
 # Shuffle once
 python3 -m realistinen_korttisekoitus.cli sekoita --riffle 7
 
+# Reproducible shuffle with seed
+python3 -m realistinen_korttisekoitus.cli sekoita --riffle 7 --seed 42
+
 # Run statistical analysis (10,000 iterations)
 python3 -m realistinen_korttisekoitus.cli analyysi --riffle 4 --iteraatiot 10000
 
-# Run with convergence analysis and save plots
-python3 -m realistinen_korttisekoitus.cli analyysi --riffle 7 --tallenna results.png
+# Compare cut-point distributions (beta vs binomial vs uniform)
+python3 -m realistinen_korttisekoitus.cli analyysi --jakaumavertailu
+
+# Compare collection strategies
+python3 -m realistinen_korttisekoitus.cli analyysi --strategiavertailu
 ```
 
 ## Project Structure
@@ -82,7 +141,7 @@ pytest tests/ -v
 
 ## References
 
-- Bayer, D. & Diaconis, P. (1992). *Trailing the Dovetail Shuffle to its Lair*. The Annals of Applied Probability, 2(2), 294–313.
+- Bayer, D. & Diaconis, P. (1992). *Trailing the Dovetail Shuffle to its Lair*. The Annals of Applied Probability, 2(2), 294–313. https://doi.org/10.1214/aoap/1177005705
 - Diaconis, P., McGrath, M. & Pitman, J. (1995). *Riffle shuffles, cycles, and descents*. Combinatorica, 15(1), 11–29.
 
 ## License

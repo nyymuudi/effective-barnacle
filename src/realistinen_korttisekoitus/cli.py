@@ -22,7 +22,7 @@ def _demo_jako() -> EdellinenJako:
 def cmd_sekoita(args) -> None:
     jako = _demo_jako()
     pakka = valmistele_pakka_seuraavaa_jakoa_varten(
-        jako, args.riffle, args.strip, args.strategia
+        jako, args.riffle, args.strip, args.strategia, seed=args.seed
     )
     print("Sekoitettu pakka:", pakka)
 

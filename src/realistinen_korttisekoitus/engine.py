@@ -1,3 +1,4 @@
+import random
 from .kerays import KERÄYS_STRATEGIAT
 from .shuffle import riffle_shuffle, strip_shuffle, leikkaa_pakka
 from .models import EdellinenJako, Kortti
@@ -8,6 +9,7 @@ def valmistele_pakka_seuraavaa_jakoa_varten(
     riffle_toistot: int = 4,
     tee_strip: bool = True,
     keräys_strategia: str = "perus",
+    seed: int | None = None,
 ) -> list[Kortti]:
     """
     Pääputki: kerää kortit valitulla strategialla, sekoita ja leikkaa.
@@ -16,13 +18,18 @@ def valmistele_pakka_seuraavaa_jakoa_varten(
         edellinen:         Edellisen jaon tiedot.
         riffle_toistot:    Riffle-sekoitusten määrä (suositus: 4–7).
         tee_strip:         Suoritetaanko strip-sekoitus riffle-sarjan välissä.
-        keräys_strategia:  Yksi arvoista 'perus', 'voittaja_päälle', 'poltetut_erikseen'.
+        keräys_strategia:  Yksi arvoista 'perus', 'voittaja_päälle'.
+        seed:              Satunnaislukugeneraattorin siemen toistettavuutta varten.
+                           None = ei seedatä (oletuskäyttäytyminen).
     """
     if keräys_strategia not in KERÄYS_STRATEGIAT:
         raise ValueError(
             f"Tuntematon keräysstrategia: '{keräys_strategia}'. "
             f"Validi strategia on yksi seuraavista: {list(KERÄYS_STRATEGIAT)}"
         )
+
+    if seed is not None:
+        random.seed(seed)
 
     kerää = KERÄYS_STRATEGIAT[keräys_strategia]
     pakka = kerää(edellinen)
