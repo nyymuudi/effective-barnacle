@@ -22,7 +22,8 @@ def _demo_jako() -> EdellinenJako:
 def cmd_sekoita(args) -> None:
     jako = _demo_jako()
     pakka = valmistele_pakka_seuraavaa_jakoa_varten(
-        jako, args.riffle, args.strip, args.strategia, seed=args.seed
+        jako, args.riffle, args.strip, args.strategia, seed=args.seed,
+        dealer_profiili=args.profiili
     )
     print("Sekoitettu pakka:", pakka)
 
@@ -30,15 +31,22 @@ def cmd_sekoita(args) -> None:
 def cmd_analyysi(args) -> None:
     from .analysis import (
         aja_simulaatio, aja_fisher_yates_simulaatio, aja_konvergenssianalyysi,
-        aja_jakaumavertailu, aja_strategiavertailu,
+        aja_jakaumavertailu, aja_strategiavertailu, aja_profiilivertailu,
         piirra_heatmap, piirra_konvergenssikayra, piirra_jakaumavertailu,
-        piirra_strategiavertailu, piirra_yhteenveto_taulukko,
+        piirra_strategiavertailu, piirra_profiilivertailu, piirra_yhteenveto_taulukko,
     )
 
     if args.jakaumavertailu:
         print(f"Ajetaan jakaumavertailu ({args.iteraatiot:,} iteraatiota, {args.riffle} rifflellä)...")
         data = aja_jakaumavertailu(n_iteraatiot=args.iteraatiot, riffle_toistot=args.riffle)
         piirra_jakaumavertailu(data, tallenna=args.tallenna)
+        return
+
+    if args.profiilivertailu:
+        print(f'Ajetaan profiilivertailu ({args.iteraatiot:,} iteraatiota)...')
+        fy = aja_fisher_yates_simulaatio(n_iteraatiot=args.iteraatiot)
+        data = aja_profiilivertailu(n_iteraatiot=args.iteraatiot)
+        piirra_profiilivertailu(data, fy_counts=fy, tallenna=args.tallenna)
         return
 
     if args.strategiavertailu:
@@ -69,6 +77,8 @@ def main():
     p_sek.add_argument("--riffle", type=int, default=4)
     p_sek.add_argument("--no-strip", action="store_false", dest="strip")
     p_sek.add_argument("--strategia", default="perus", choices=["perus", "voittaja_päälle"])
+    p_sek.add_argument("--profiili", default=None, choices=["ideaali", "kokenut", "aloittelija"])
+    p_sek.add_argument("--seed", type=int, default=None)
 
     # analyysi
     p_ana = alikomennot.add_parser("analyysi", help="Tilastollinen analyysi")
@@ -78,6 +88,9 @@ def main():
     p_ana.add_argument("--tallenna", type=str, default=None)
     p_ana.add_argument("--jakaumavertailu", action="store_true",
                        help="Vertaa beta/binomial/uniform leikkauspistejakaumia")
+    p_ana.add_argument("--profiilivertailu", action="store_true",
+                       help="Vertaa dealer-profiileja (human imperfection model)")
+    p_ana.add_argument("--seed", type=int, default=None)
     p_ana.add_argument("--strategiavertailu", action="store_true",
                        help="Vertaa keräysstrategioiden konvergenssia")
 

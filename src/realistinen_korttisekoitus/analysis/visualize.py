@@ -179,3 +179,57 @@ def piirra_yhteenveto_taulukko(
     print(f"{'TVD keskiarvo':.<30} {gsr['tvd_keskiarvo']:>20.4f} {fy['tvd_keskiarvo']:>15.4f}")
     print(f"{'Bias p-arvo (mediaani)':.<30} {gsr['bias_p_mediaani']:>20.4f} {fy['bias_p_mediaani']:>15.4f}")
     print(f"{'Biased kortit (p<0.05)':.<30} {gsr['bias_merkittavia']:>20} {fy['bias_merkittavia']:>15}")
+
+
+def piirra_profiilivertailu(
+    profiilivertailu: dict[str, dict[int, np.ndarray]],
+    fy_counts: np.ndarray | None = None,
+    tallenna: str | None = None,
+) -> None:
+    """
+    Human imperfection model: konvergenssikäyrät dealer-profiileittain.
+    Vastaa: kuinka paljon inhimillinen epätarkkuus hidastaa konvergenssia?
+    """
+    värit = {
+        "ideaali":     "#2196F3",
+        "kokenut":     "#4CAF50",
+        "aloittelija": "#FF5722",
+    }
+    riffle_arvot = sorted(list(profiilivertailu.values())[0].keys())
+    max_entropia = np.log2(list(list(profiilivertailu.values())[0].values())[0].shape[0])
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+
+    for profiili, counts_per_riffle in profiilivertailu.items():
+        tvd = [laske_total_variation_distance(counts_per_riffle[k]).mean()
+               for k in riffle_arvot]
+        entropia = [laske_entropia(counts_per_riffle[k]).mean() / max_entropia
+                    for k in riffle_arvot]
+        väri = värit.get(profiili, "gray")
+        ax1.plot(riffle_arvot, tvd, "o-", color=väri, linewidth=2, label=profiili)
+        ax2.plot(riffle_arvot, entropia, "o-", color=väri, linewidth=2, label=profiili)
+
+    if fy_counts is not None:
+        fy_tvd = laske_total_variation_distance(fy_counts).mean()
+        fy_entropia = laske_entropia(fy_counts).mean() / max_entropia
+        ax1.axhline(fy_tvd, color="gray", linestyle="--", linewidth=1.5, label="Fisher-Yates")
+        ax2.axhline(fy_entropia, color="gray", linestyle="--", linewidth=1.5, label="Fisher-Yates")
+
+    ax1.set_title("TVD konvergenssi profiileittain")
+    ax1.set_xlabel("Riffle-toistot")
+    ax1.set_ylabel("TVD keskiarvo")
+    ax1.legend()
+    ax1.grid(alpha=0.3)
+
+    ax2.set_title("Entropia konvergenssi profiileittain")
+    ax2.set_xlabel("Riffle-toistot")
+    ax2.set_ylabel("H / H_max")
+    ax2.legend()
+    ax2.grid(alpha=0.3)
+
+    plt.suptitle("Human Imperfection Model: dealer-profiilin vaikutus konvergenssiin",
+                 fontsize=13)
+    plt.tight_layout()
+    if tallenna:
+        plt.savefig(tallenna, dpi=150)
+    plt.show()

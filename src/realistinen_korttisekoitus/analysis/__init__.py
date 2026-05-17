@@ -4,6 +4,7 @@ from .montecarlo import (
     aja_konvergenssianalyysi,
     aja_jakaumavertailu,
     aja_strategiavertailu,
+    aja_profiilivertailu,
 )
 from .metrics import (
     laske_entropia,
@@ -16,5 +17,6 @@ from .visualize import (
     piirra_konvergenssikayra,
     piirra_jakaumavertailu,
     piirra_strategiavertailu,
+    piirra_profiilivertailu,
     piirra_yhteenveto_taulukko,
 )

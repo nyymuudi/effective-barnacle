@@ -182,3 +182,48 @@ def aja_strategiavertailu(
         tulokset[strategia_nimi] = counts_per_riffle
 
     return tulokset
+
+
+def aja_profiilivertailu(
+    n_kortit: int = 52,
+    n_iteraatiot: int = 10_000,
+    max_riffle: int = 10,
+) -> dict[str, dict[int, np.ndarray]]:
+    """
+    Human imperfection model: konvergenssivertailu dealer-profiileittain.
+
+    Ajaa simulaation kaikilla kolmella profiililla (ideaali, kokenut, aloittelija)
+    riffle-toistomäärillä 1..max_riffle.
+
+    Vastaa kysymykseen: kuinka paljon inhimillinen epätarkkuus hidastaa konvergenssia?
+
+    Palauttaa:
+        {profiili_nimi: {riffle_toistot: counts-matriisi}}
+    """
+    from ..shuffle import imperfect_riffle_shuffle, strip_shuffle, leikkaa_pakka
+    from ..models import DEALER_PROFIILIT
+
+    tulokset: dict[str, dict[int, np.ndarray]] = {}
+
+    for profiili_nimi, profiili in DEALER_PROFIILIT.items():
+        counts_per_riffle: dict[int, np.ndarray] = {}
+
+        for k in range(1, max_riffle + 1):
+            counts = np.zeros((n_kortit, n_kortit), dtype=np.int32)
+            pakka_orig = list(range(n_kortit))
+
+            for _ in range(n_iteraatiot):
+                pakka = pakka_orig[:]
+                for i in range(k):
+                    pakka = imperfect_riffle_shuffle(pakka, profiili)
+                    if i == 1:
+                        pakka = strip_shuffle(pakka, profiili.strip_irregularity)
+                pakka = leikkaa_pakka(pakka)
+                for paikka, kortti in enumerate(pakka):
+                    counts[kortti, paikka] += 1
+
+            counts_per_riffle[k] = counts
+
+        tulokset[profiili_nimi] = counts_per_riffle
+
+    return tulokset
